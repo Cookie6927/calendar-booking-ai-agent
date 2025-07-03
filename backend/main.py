@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from datetime import datetime, timedelta, timezone
-from lang_agent import agent
+from lang_agent import run_agent
 from pydantic import BaseModel
 
 
@@ -62,13 +62,14 @@ def check_availability():
 def chat_with_user(input: ChatInput):
     try:
         print("🔹 Incoming message:", input.message)
-        response = agent.run(input.message)
+        response = run_agent(input.message)  # now returns a dict
         print("✅ Agent response:", response)
-        return {"response": response}
+        return response
     except Exception as e:
         print("❌ ERROR in agent.run:", e)
         raise HTTPException(status_code=500, detail=str(e))
-
+    
+    
 @app.post("/book_appointment")
 def book_appointment():
     start_time = (datetime.now(timezone.utc) + timedelta(hours=1)).isoformat()
