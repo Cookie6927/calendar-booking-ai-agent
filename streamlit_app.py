@@ -17,7 +17,7 @@ if user_input:
     st.session_state.messages.append({"role": "user", "content": user_input})
 
     try:
-        response = requests.post("http://127.0.0.1:8000/chat", json={"message": user_input})
+        response = requests.post("https://calendar-booking-ai-agent-production.up.railway.app/chat", json={"message": user_input})
         if response.status_code == 200:
             data = response.json()
             final_answer = data.get("final_answer", "✅ Done.")
