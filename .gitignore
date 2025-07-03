@@ -1,0 +1,35 @@
+
+# Python bytecode
+__pycache__/
+*.py[cod]
+*.egg-info/
+*.log
+
+# Virtual environment
+venv/
+ENV/
+env/
+
+# IDE/editor settings
+.vscode/
+.idea/
+*.swp
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environment and secret files
+backend/long-operator-464606-m2-c0cbe481778d.json
+backend/.env
+*.json  # if you're storing Google service_account.json
+
+# Streamlit cache and logs
+.streamlit/
+.stcache/
+.stfolder/
+logs/
+
+# Misc
+*.bak
+*.tmp
