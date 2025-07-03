@@ -20,8 +20,8 @@ env/
 Thumbs.db
 
 # Environment and secret files
-backend/long-operator-464606-m2-c0cbe481778d.json
-backend/.env
+long-operator-464606-m2-c0cbe481778d.json
+.env
 *.json  # if you're storing Google service_account.json
 
 # Streamlit cache and logs
@@ -33,3 +33,4 @@ logs/
 # Misc
 *.bak
 *.tmp
+creds.json

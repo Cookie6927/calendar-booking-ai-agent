@@ -6,27 +6,28 @@ def book_meeting_on_calendar(query: str) -> str:
     from google.oauth2 import service_account
     import json
 
-    GOOGLE_CREDENTIALS_JSON = os.getenv("GOOGLE_CREDENTIALS_JSON")
-
-    if GOOGLE_CREDENTIALS_JSON:
-        creds_dict = json.loads(GOOGLE_CREDENTIALS_JSON)
-        with open("creds.json", "w") as f:
-            json.dump(creds_dict, f)
-
-        credentials = service_account.Credentials.from_service_account_file(
-            "creds.json",
-            scopes=["https://www.googleapis.com/auth/calendar"]
-        )
-    else:
+    # Load credentials from env var
+    creds_json = os.getenv("GOOGLE_CREDENTIALS_JSON")
+    if not creds_json:
         raise ValueError("❌ GOOGLE_CREDENTIALS_JSON not set")
 
-    # Try to parse user query
+    try:
+        creds_dict = json.loads(creds_json)
+    except json.JSONDecodeError as e:
+        raise ValueError(f"❌ Invalid JSON in GOOGLE_CREDENTIALS_JSON: {e}")
+
+    credentials = service_account.Credentials.from_service_account_info(
+        creds_dict,
+        scopes=["https://www.googleapis.com/auth/calendar"]
+    )
+
+    # Try to parse the query into datetime
     parsed_dt = dateparser.parse(
         query,
         settings={'TIMEZONE': 'Asia/Kolkata', 'RETURN_AS_TIMEZONE_AWARE': True}
     )
 
-    # Fallback: if parsing fails, default to tomorrow 3PM IST
+    # Fallback: Tomorrow at 3PM IST
     if not parsed_dt:
         ist = timezone(timedelta(hours=5, minutes=30))
         parsed_dt = datetime.now(ist).replace(hour=15, minute=0, second=0, microsecond=0) + timedelta(days=1)
@@ -34,12 +35,7 @@ def book_meeting_on_calendar(query: str) -> str:
     start_time = parsed_dt
     end_time = start_time + timedelta(hours=1)
 
-    creds = service_account.Credentials.from_service_account_file(
-        os.getenv("GOOGLE_CREDENTIALS_PATH"),
-        scopes=["https://www.googleapis.com/auth/calendar"]
-    )
-
-    service = build("calendar", "v3", credentials=creds)
+    service = build("calendar", "v3", credentials=credentials)
 
     event = {
         "summary": "Meeting via AI Agent",
@@ -54,5 +50,9 @@ def book_meeting_on_calendar(query: str) -> str:
         }
     }
 
-    event = service.events().insert(calendarId=os.getenv("CALENDAR_ID"), body=event).execute()
-    return f"📅 Meeting booked on Google Calendar: {event.get('htmlLink')}"
+    calendar_id = os.getenv("CALENDAR_ID")
+    if not calendar_id:
+        raise ValueError("❌ CALENDAR_ID not set")
+
+    created_event = service.events().insert(calendarId=calendar_id, body=event).execute()
+    return f"📅 Meeting booked! [View on Calendar]({created_event.get('htmlLink')})"
