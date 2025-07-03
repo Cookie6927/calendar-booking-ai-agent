@@ -4,6 +4,21 @@ def book_meeting_on_calendar(query: str) -> str:
     import dateparser
     from googleapiclient.discovery import build
     from google.oauth2 import service_account
+    import json
+
+    GOOGLE_CREDENTIALS_JSON = os.getenv("GOOGLE_CREDENTIALS_JSON")
+
+    if GOOGLE_CREDENTIALS_JSON:
+        creds_dict = json.loads(GOOGLE_CREDENTIALS_JSON)
+        with open("creds.json", "w") as f:
+            json.dump(creds_dict, f)
+
+        credentials = service_account.Credentials.from_service_account_file(
+            "creds.json",
+            scopes=["https://www.googleapis.com/auth/calendar"]
+        )
+    else:
+        raise ValueError("❌ GOOGLE_CREDENTIALS_JSON not set")
 
     # Try to parse user query
     parsed_dt = dateparser.parse(

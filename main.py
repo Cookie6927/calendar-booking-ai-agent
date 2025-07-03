@@ -1,5 +1,5 @@
 # backend/main.py
-
+import json
 import os
 from fastapi import FastAPI
 from fastapi import HTTPException
@@ -10,6 +10,22 @@ from googleapiclient.discovery import build
 from datetime import datetime, timedelta, timezone
 from lang_agent import run_agent
 from pydantic import BaseModel
+
+
+
+GOOGLE_CREDENTIALS_JSON = os.getenv("GOOGLE_CREDENTIALS_JSON")
+
+if GOOGLE_CREDENTIALS_JSON:
+    creds_dict = json.loads(GOOGLE_CREDENTIALS_JSON)
+    with open("creds.json", "w") as f:
+        json.dump(creds_dict, f)
+
+    credentials = service_account.Credentials.from_service_account_file(
+        "creds.json",
+        scopes=["https://www.googleapis.com/auth/calendar"]
+    )
+else:
+    raise ValueError("❌ GOOGLE_CREDENTIALS_JSON not set")
 
 
 # Load environment variables
