@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain.agents import initialize_agent, Tool
 from langchain.agents.agent_types import AgentType
-from calendar_utils import book_meeting_on_calendar
+from calendar_utils import book_meeting_on_calendar, get_schedule_for_date
 
 
 # Load environment variables from .env file
@@ -28,7 +28,14 @@ tools = [
         "Books a 1-hour meeting using Google Calendar. "
         "You must clearly mention the day and time, e.g., 'next Sunday at 3pm' or 'tomorrow at 9 AM'."
     )
+    ),
+    Tool(
+        name="CheckSchedule",
+        func=get_schedule_for_date,
+        description="Use to retrieve events scheduled on a specific date."
     )
+
+
 ]
 
 # Initialize Gemini model

@@ -1,12 +1,20 @@
 # streamlit_app.py
 
 import streamlit as st
+import streamlit.components.v1 as components
+
 import requests
 
 st.set_page_config(page_title="Calendar Bot 🤖", layout="centered")
 
 st.title("📅 AI Calendar Booking Assistant")
 st.caption("Ask me to book a meeting, and I’ll handle the rest.")
+
+st.title("📆 My Google Calendar")
+
+calendar_url = "https://calendar.google.com/calendar/embed?src=189093c334f413341069238d85b8cc189a801bbd4483a902355edea887444cca%40group.calendar.google.com&ctz=Asia%2FKolkata"
+
+components.iframe(calendar_url, height=300, scrolling=True)
 
 if "messages" not in st.session_state:
     st.session_state.messages = []
@@ -17,6 +25,7 @@ if user_input:
     st.session_state.messages.append({"role": "user", "content": user_input})
 
     try:
+        #response = requests.post("http://127.0.0.1:8000/chat", json={"message": user_input})
         response = requests.post("https://calendar-booking-ai-agent-production.up.railway.app/chat", json={"message": user_input})
         if response.status_code == 200:
             data = response.json()
